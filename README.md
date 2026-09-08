@@ -15,31 +15,42 @@ NCAR Command Language（NCL）的 Tree-sitter 原型，用于语法树分析和 
 - LuaSnip for snippet completion
 - nvim-treesitter for Tree-sitter indentation
 
-### Build
+### lazy.nvim
 
-```sh
-git clone https://github.com/jwfeng/tree-sitter-ncl.git
-cd tree-sitter-ncl
-npm install
-npm run build
+Add this plugin spec to your lazy.nvim plugins directory:
+
+```lua
+return {
+  {
+    "fengjiawang/tree-sitter-ncl",
+    build = "npm install --ignore-scripts && npm run build",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "L3MON4D3/LuaSnip",
+      "saghen/blink.cmp",
+    },
+    config = function(plugin)
+      dofile(plugin.dir .. "/examples/neovim.lua")
+      dofile(plugin.dir .. "/examples/neovim-snippets.lua")
+    end,
+  },
+}
 ```
 
-The build creates `ncl.so` in the project root. Keep the checkout in place because
-the Neovim integration loads the parser and query files directly from this directory.
+Restart Neovim after installation and open an `.ncl` file. The spec builds and loads
+the parser, syntax queries, Tree-sitter indentation, the bundled LuaSnip catalog, and
+the blink.cmp completion source. It does not read any external snippets directory.
 
-### Neovim
-
-The repository provides native Neovim examples. Load the parser first, then the
-LuaSnip bridge:
+The repository provides native Neovim examples for debugging or setups without
+lazy.nvim. Build the parser first, then load the parser and LuaSnip bridge:
 
 ```vim
 :luafile /path/to/tree-sitter-ncl/examples/neovim.lua
 :luafile /path/to/tree-sitter-ncl/examples/neovim-snippets.lua
 ```
 
-For a persistent setup, load the same two files from your Neovim configuration after
-`npm run build`. The snippets bridge uses the catalog bundled in
-`data/ncl-snippets.json` and does not read the original snippets directory.
+The snippets bridge uses the catalog bundled in `data/ncl-snippets.json` and does not
+read the original snippets directory.
 
 ## 构建与验证
 
