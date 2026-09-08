@@ -24,11 +24,17 @@ npm test               # 语法 corpus，包含预期错误用例
 npm run build          # 等同 make；不会下载或重装 CLI
 npm run check          # 加上示例解析和原生 Neovim 检查
 npm run check:editor   # 加上 LuaSnip、缩进、blink.cmp 和 lazy.nvim 安装入口验证
+npm run bench          # 单独测量 NCL 初始化及未修改缓冲区的重复刷新耗时
 ```
 
 原生检查需要 Neovim。编辑器检查默认从 Neovim 数据目录下的 `lazy/` 查找已安装插件，
 可用 `NCL_LUASNIP_PATH`、`NCL_TREESITTER_PATH`、`NCL_LAZY_PATH`、`NCL_BLINK_PATH` 指定 checkout。
 测试不加载个人 `init.lua` 或 NCL 配置；不会运行示例中的业务调用。
+
+模板使用 LuaSnip 的 `SnippetProxy`：触发词、说明和上下文立即注册，展开时才解析占位符。
+函数调用模板按缓冲区和修改计数缓存；有效函数签名没有变化时不重新注册，避免反复清空补全缓存。
+`test:snippet-loading` 会对照原来的立即解析方式核对全部模板的展开文本，并检查函数签名变化和缓冲区切换时的缓存失效。
+性能比较应在多个独立 Neovim 进程中取中位数；`bench` 不包含完整个人配置、UI 绘制或所有插件的启动时间。
 
 新语法先添加 `test/corpus/` 用例。更新快照时检查树形结构和字段，不能将意外 ERROR 当作正确结果。
 提交语法变更时一并提交生成文件。机器相关的 `ncl.so`、缓存和 `node_modules/` 不提交。

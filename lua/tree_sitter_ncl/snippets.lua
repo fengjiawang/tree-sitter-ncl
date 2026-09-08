@@ -3,6 +3,9 @@ local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h:h")
 local ls
 local cached_context = {}
 local catalog_triggers = {}
+local definition_query
+local last_buffer, last_tick, last_count
+local last_signature
 
 -- Tree-sitter supplies context, while the catalog supplies argument names,
 -- descriptions and templates that a grammar cannot infer for library functions.
@@ -40,14 +43,16 @@ function M.is_catalog_trigger(trigger) return catalog_triggers[trigger] == true 
 function M.refresh_buffer()
   if not ls or vim.bo.filetype ~= "ncl" then return end
   local bufnr = vim.api.nvim_get_current_buf()
+  local tick = vim.api.nvim_buf_get_changedtick(bufnr)
+  if bufnr == last_buffer and tick == last_tick then return last_count end
   local ok, parser = pcall(vim.treesitter.get_parser, bufnr, "ncl")
   if not ok then return end
   local tree = parser:parse()[1]
-  local query = vim.treesitter.query.parse("ncl", [[
+  definition_query = definition_query or vim.treesitter.query.parse("ncl", [[
     [(function_definition) (procedure_definition)] @definition
   ]])
-  local snippets, seen = {}, {}
-  for _, definition in query:iter_captures(tree:root(), bufnr) do
+  local definitions, seen = {}, {}
+  for _, definition in definition_query:iter_captures(tree:root(), bufnr) do
     local name_node = definition:field("name")[1]
     local parameters = definition:field("parameters")[1]
     if name_node and parameters and not definition:has_error() then
@@ -61,23 +66,37 @@ function M.refresh_buffer()
             args[#args + 1] = string.format("${%d:%s}", #args + 1, param_name)
           end
         end
-        snippets[#snippets + 1] = ls.parser.parse_snippet({
-          trig = name, name = name, dscr = "From this buffer's NCL syntax tree",
-          priority = 1200,
-          condition = function() return vim.api.nvim_get_current_buf() == bufnr and in_code() end,
-          show_condition = function() return vim.api.nvim_get_current_buf() == bufnr and in_code() end,
-        }, name .. "(" .. table.concat(args, ", ") .. ")$0")
+        definitions[#definitions + 1] = { name, name .. "(" .. table.concat(args, ", ") .. ")$0" }
       end
     end
   end
+  local signature = vim.json.encode({ bufnr, definitions })
+  if signature == last_signature then
+    last_buffer, last_tick = bufnr, tick
+    return last_count
+  end
+  local snippets = {}
+  for _, definition in ipairs(definitions) do
+    snippets[#snippets + 1] = ls.parser.parse_snippet({
+      trig = definition[1], name = definition[1], dscr = "From this buffer's NCL syntax tree",
+      priority = 1200,
+      condition = function() return vim.api.nvim_get_current_buf() == bufnr and in_code() end,
+      show_condition = function() return vim.api.nvim_get_current_buf() == bufnr and in_code() end,
+    }, definition[2])
+  end
   -- Replace the previous buffer's generated snippets; don't accumulate them.
   ls.add_snippets("ncl", snippets, { key = "tree-sitter-ncl-buffer" })
+  last_buffer, last_tick, last_count = bufnr, tick, #snippets
+  last_signature = signature
   return #snippets
 end
 
 function M.setup(opts)
   opts = opts or {}
   ls = require("luasnip")
+  local snippet_proxy = require("luasnip.nodes.snippetProxy")
+  last_buffer, last_tick, last_count = nil, nil, nil
+  last_signature = nil
   catalog_triggers = {}
   local entries = {}
   if opts.catalog ~= false then
@@ -88,7 +107,9 @@ function M.setup(opts)
     catalog_triggers[entry.trigger] = true
     local is_string = entry.category == "color_table" or entry.category == "font"
     local condition = is_string and in_string or in_code
-    snippets[#snippets + 1] = ls.parser.parse_snippet({
+    -- Register trigger/description/context immediately. LuaSnip parses the
+    -- placeholder tree only when this specific snippet is expanded.
+    snippets[#snippets + 1] = snippet_proxy({
       trig = entry.trigger, name = entry.name, dscr = entry.description,
       wordTrig = entry.trigger:sub(1, 1) ~= "@",
       condition = condition, show_condition = condition,

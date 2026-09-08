@@ -12,7 +12,9 @@
     "test:editor": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/editor.lua",
     "test:lazy": "mkdir -p .cache/state/nvim && XDG_CACHE_HOME=\"$PWD/.cache\" XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/lazy.lua",
     "test:blink": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/blink.lua",
-    "check:editor": "npm run check && npm run test:editor && npm run test:blink && npm run test:lazy",
+    "test:snippet-loading": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/snippet-loading.lua",
+    "bench": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/benchmark.lua",
+    "check:editor": "npm run check && npm run test:editor && npm run test:blink && npm run test:lazy && npm run test:snippet-loading",
     "check": "npm run generate && npm run test && npm run test:examples && npm run build && npm run test:neovim"
   },
   "devDependencies": {"tree-sitter-cli": "0.27.0"}
