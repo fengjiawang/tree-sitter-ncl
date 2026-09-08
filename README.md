@@ -23,7 +23,7 @@ Add this plugin spec to your lazy.nvim plugins directory:
 return {
   {
     "fengjiawang/tree-sitter-ncl",
-    build = "npm install --ignore-scripts && npm run build",
+    build = "npm install && npm run build",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "L3MON4D3/LuaSnip",
@@ -40,6 +40,8 @@ return {
 Restart Neovim after installation and open an `.ncl` file. The spec builds and loads
 the parser, syntax queries, Tree-sitter indentation, the bundled LuaSnip catalog, and
 the blink.cmp completion source. It does not read any external snippets directory.
+If the plugin was already installed with an older spec, run `:Lazy build tree-sitter-ncl`
+once after updating the configuration.
 
 The repository provides native Neovim examples for debugging or setups without
 lazy.nvim. Build the parser first, then load the parser and LuaSnip bridge:
