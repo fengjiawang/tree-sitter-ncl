@@ -37,22 +37,6 @@ local function in_string() return context() == "string" end
 M.context = context
 function M.is_catalog_trigger(trigger) return catalog_triggers[trigger] == true end
 
-local function configure_blink_buffer_filter()
-  local ok, config = pcall(require, "blink.cmp.config")
-  if not ok or not config.sources.providers.buffer then return end
-  local provider = config.sources.providers.buffer
-  if provider.tree_sitter_ncl_filter then return end
-  local previous = provider.transform_items
-  provider.transform_items = function(context, items)
-    if previous then items = previous(context, items) end
-    if vim.bo.filetype ~= "ncl" then return items end
-    return vim.tbl_filter(function(item)
-      return not M.is_catalog_trigger(item.label)
-    end, items)
-  end
-  provider.tree_sitter_ncl_filter = true
-end
-
 function M.refresh_buffer()
   if not ls or vim.bo.filetype ~= "ncl" then return end
   local bufnr = vim.api.nvim_get_current_buf()
@@ -94,7 +78,6 @@ end
 function M.setup(opts)
   opts = opts or {}
   ls = require("luasnip")
-  configure_blink_buffer_filter()
   catalog_triggers = {}
   local entries = {}
   if opts.catalog ~= false then
@@ -117,6 +100,13 @@ function M.setup(opts)
     group = group,
     callback = M.refresh_buffer,
   })
+  vim.api.nvim_create_autocmd("User", {
+    group = group, pattern = "LazyLoad",
+    callback = function(event)
+      if event.data == "blink.cmp" then require("tree_sitter_ncl.blink").setup() end
+    end,
+  })
+  require("tree_sitter_ncl.blink").setup()
   M.refresh_buffer()
   return #snippets
 end

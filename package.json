@@ -5,12 +5,14 @@
   "description": "Tree-sitter grammar prototype for NCAR Command Language",
   "scripts": {
     "generate": "node scripts/generate-highlights.js && tree-sitter generate",
-    "build": "npm rebuild tree-sitter-cli && XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter build --output ncl.so",
+    "build": "make",
     "test": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter test",
     "test:examples": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter parse --quiet examples/weather.ncl examples/language.ncl",
     "test:neovim": "nvim --headless -u NONE -i NONE -l test/neovim.lua",
     "test:editor": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/editor.lua",
-    "check:editor": "npm run check && npm run test:editor",
+    "test:lazy": "mkdir -p .cache/state/nvim && XDG_CACHE_HOME=\"$PWD/.cache\" XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/lazy.lua",
+    "test:blink": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/blink.lua",
+    "check:editor": "npm run check && npm run test:editor && npm run test:blink && npm run test:lazy",
     "check": "npm run generate && npm run test && npm run test:examples && npm run build && npm run test:neovim"
   },
   "devDependencies": {"tree-sitter-cli": "0.27.0"}
