@@ -41,7 +41,8 @@ Restart Neovim after installation and open an `.ncl` file. The spec builds and l
 the parser, syntax queries, Tree-sitter indentation, the bundled LuaSnip catalog, and
 the blink.cmp completion source. It does not read any external snippets directory.
 If the plugin was already installed with an older spec, run `:Lazy build tree-sitter-ncl`
-once after updating the configuration.
+once after updating the configuration; the build also repairs an older incomplete
+`tree-sitter-cli` installation.
 
 The repository provides native Neovim examples for debugging or setups without
 lazy.nvim. Build the parser first, then load the parser and LuaSnip bridge:

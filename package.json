@@ -5,7 +5,7 @@
   "description": "Tree-sitter grammar prototype for NCAR Command Language",
   "scripts": {
     "generate": "node scripts/generate-highlights.js && tree-sitter generate",
-    "build": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter build --output ncl.so",
+    "build": "npm rebuild tree-sitter-cli && XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter build --output ncl.so",
     "test": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter test",
     "test:examples": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter parse --quiet examples/weather.ncl examples/language.ncl",
     "test:neovim": "nvim --headless -u NONE -i NONE -l test/neovim.lua",
