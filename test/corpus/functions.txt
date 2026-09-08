@@ -1,0 +1,113 @@
+==================
+Function declaration with dimensions and locals
+==================
+
+function anomaly(x[*][2]:numeric, y:numeric)
+local z, i
+begin
+  z = x - y
+  return(z)
+end
+
+---
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (dimension_size)
+        (dimension_size
+          (integer))
+        (type))
+      (parameter
+        (identifier)
+        (type)))
+    (local_declaration
+      (identifier)
+      (identifier))
+    (block
+      (assignment_statement
+        (identifier)
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (return_statement
+        (parenthesized_expression
+          (identifier))))))
+
+==================
+Procedure and bare return
+==================
+
+procedure report(x)
+begin
+  print(x)
+  return
+end
+
+---
+
+(source_file
+  (procedure_definition
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)))
+    (block
+      (call_statement
+        (application_expression
+          (identifier)
+          (argument_list
+            (identifier))))
+      (return_statement))))
+
+==================
+Function and index syntax share a node
+==================
+
+x = f(i)
+y = a(i)
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (identifier))))
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (identifier)))))
+
+==================
+New arrays with typed and string type
+==================
+
+x = new((/2, 3/), float, -999.)
+y = new(2, "graphic")
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (new_expression
+      (array
+        (integer)
+        (integer))
+      (type)
+      (unary_expression
+        (float))))
+  (assignment_statement
+    (identifier)
+    (new_expression
+      (integer)
+      (string
+        (string_content)))))

@@ -1,0 +1,115 @@
+==================
+Missing end if
+:error
+==================
+
+if (True) then
+  x = 1
+
+---
+
+
+
+==================
+Unclosed array
+:error
+==================
+
+x = (/1, 2
+
+---
+
+
+
+==================
+Unclosed string
+:error
+==================
+
+x = "unterminated
+
+---
+
+
+
+==================
+Missing assignment RHS
+:error
+==================
+
+x =
+y = 2
+
+---
+
+
+
+==================
+Fortran exclamation is not an NCL comment
+:error
+==================
+
+! not a comment
+
+---
+
+
+
+==================
+C style comment is not NCL syntax
+:error
+==================
+
+/* not an NCL comment */
+
+---
+
+
+
+==================
+Snippet do without while is not NCL
+:error
+==================
+
+do (True)
+  break
+end do
+
+---
+
+
+
+==================
+Wrong loop closer
+:error
+==================
+
+do i = 0, 2
+  print(i)
+end if
+
+---
+
+
+
+==================
+No newline between simple statements
+:error
+==================
+
+x = 1 y = 2
+
+---
+
+
+
+==================
+Unterminated NCL block comment
+:error
+==================
+
+/; never closed
+
+---
+
+

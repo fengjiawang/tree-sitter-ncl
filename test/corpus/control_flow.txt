@@ -1,0 +1,193 @@
+==================
+Nested else if requires two closers
+==================
+
+if (a) then
+  print(a)
+else if (b) then
+  print(b)
+else
+  print(c)
+end if
+end if
+
+---
+
+(source_file
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (call_statement
+      (application_expression
+        (identifier)
+        (argument_list
+          (identifier))))
+    (else_clause
+      (if_statement
+        (parenthesized_expression
+          (identifier))
+        (call_statement
+          (application_expression
+            (identifier)
+            (argument_list
+              (identifier))))
+        (else_clause
+          (call_statement
+            (application_expression
+              (identifier)
+              (argument_list
+                (identifier)))))))))
+
+==================
+Elseif uses one closer
+==================
+
+if a then
+  print(a)
+elseif b then
+  print(b)
+else
+  print(c)
+end if
+
+---
+
+(source_file
+  (if_statement
+    (identifier)
+    (call_statement
+      (application_expression
+        (identifier)
+        (argument_list
+          (identifier))))
+    (elseif_clause
+      (identifier)
+      (call_statement
+        (application_expression
+          (identifier)
+          (argument_list
+            (identifier)))))
+    (else_clause
+      (call_statement
+        (application_expression
+          (identifier)
+          (argument_list
+            (identifier)))))))
+
+==================
+Inline block and conditional
+==================
+
+begin print(1) end
+if a then print(a) else print(b) end if
+
+---
+
+(source_file
+  (block
+    (call_statement
+      (application_expression
+        (identifier)
+        (argument_list
+          (integer)))))
+  (if_statement
+    (identifier)
+    (call_statement
+      (application_expression
+        (identifier)
+        (argument_list
+          (identifier))))
+    (else_clause
+      (call_statement
+        (application_expression
+          (identifier)
+          (argument_list
+            (identifier)))))))
+
+==================
+Counted loops and stride
+==================
+
+do i = 10, 0, -2
+  do j = 0, 3
+    continue
+  end do
+  break
+end do
+
+---
+
+(source_file
+  (do_statement
+    (identifier)
+    (integer)
+    (integer)
+    (unary_expression
+      (integer))
+    (do_statement
+      (identifier)
+      (integer)
+      (integer)
+      (continue_statement))
+    (break_statement)))
+
+==================
+While loop
+==================
+
+do while (x .gt. 0)
+  x = x - 1
+end do
+
+---
+
+(source_file
+  (while_statement
+    (binary_expression
+      (identifier)
+      (integer))
+    (assignment_statement
+      (identifier)
+      (binary_expression
+        (identifier)
+        (integer)))))
+
+==================
+Load external and commands
+==================
+
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+external lib "./lib.so"
+lib::transform(x)
+record "session.ncl"
+stop record
+quit
+Quit
+QUIT
+exit
+
+---
+
+(source_file
+  (load_statement
+    (string
+      (string_content)))
+  (external_statement
+    (identifier)
+    (string
+      (string_content)))
+  (call_statement
+    (application_expression
+      (external_reference
+        (identifier)
+        (identifier))
+      (argument_list
+        (identifier))))
+  (command_statement
+    (string
+      (string_content)))
+  (command_statement)
+  (command_statement)
+  (command_statement)
+  (command_statement)
+  (command_statement))

@@ -1,0 +1,17 @@
+{
+  "name": "tree-sitter-ncl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tree-sitter grammar prototype for NCAR Command Language",
+  "scripts": {
+    "generate": "node scripts/generate-highlights.js && tree-sitter generate",
+    "build": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter build --output ncl.so",
+    "test": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter test",
+    "test:examples": "XDG_CACHE_HOME=\"$PWD/.cache\" tree-sitter parse --quiet examples/weather.ncl examples/language.ncl",
+    "test:neovim": "nvim --headless -u NONE -i NONE -l test/neovim.lua",
+    "test:editor": "mkdir -p .cache/state/nvim && XDG_STATE_HOME=\"$PWD/.cache/state\" nvim --headless -u NONE -i NONE -l test/editor.lua",
+    "check:editor": "npm run check && npm run test:editor",
+    "check": "npm run generate && npm run test && npm run test:examples && npm run build && npm run test:neovim"
+  },
+  "devDependencies": {"tree-sitter-cli": "0.27.0"}
+}

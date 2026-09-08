@@ -1,0 +1,247 @@
+==================
+Empty block
+==================
+
+begin
+end
+
+---
+
+(source_file
+  (block))
+
+==================
+Assignment and reassignment
+==================
+
+x = 1
+x := 2.5
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (integer))
+  (assignment_statement
+    (identifier)
+    (float)))
+
+==================
+Unary minus binds above left associative power
+==================
+
+x = -3^2^4
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (unary_expression
+          (integer))
+        (integer))
+      (integer))))
+
+==================
+NOT binds above AND and comparisons
+==================
+
+x = .not. True .and. a.eq.b
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (unary_expression
+        (boolean))
+      (binary_expression
+        (identifier)
+        (identifier)))))
+
+==================
+Multiplication binds above addition
+==================
+
+x = 1 + 2 * 3
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (integer)
+      (binary_expression
+        (integer)
+        (integer)))))
+
+==================
+OR and XOR share precedence
+==================
+
+x = a .or. b .xor. c
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (identifier))))
+
+==================
+Numbers directly adjacent to dotted operators
+==================
+
+a = 1.eq.2
+b = 3.GT.2
+c = 1..lt.2.
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (integer)
+      (integer)))
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (integer)
+      (integer)))
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (float)
+      (float))))
+
+==================
+Numeric suffixes and scientific notation
+==================
+
+a = (/1b, 2B, 3C, 4h, 5H, 6i, 7I, 8l, 9L, 10q, 11Q/)
+b = (/1., .5, 1.e3, 2E-4, 2d, 2.5D-4, .5d/)
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (array
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)
+      (integer)))
+  (assignment_statement
+    (identifier)
+    (array
+      (float)
+      (float)
+      (float)
+      (float)
+      (float)
+      (float)
+      (float))))
+
+==================
+Strings isolate semicolons operators and function names
+==================
+
+text = "gsn_panel; print @cnFillOn"
+text = "escaped \"quote\" and \\ slash" ; actual comment
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (string
+      (string_content)))
+  (assignment_statement
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)))
+  (comment))
+
+==================
+Line and NCL block comments
+==================
+
+; heading
+/; first
+second ; third
+;/
+x = True
+
+---
+
+(source_file
+  (comment)
+  (block_comment)
+  (assignment_statement
+    (identifier)
+    (boolean)))
+
+==================
+Continuation with a trailing comment
+==================
+
+x = 1 + \ ; continuation
+    2
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (integer)
+      (line_continuation)
+      (integer))))
+
+==================
+Arithmetic selection and matrix operators
+==================
+
+x = a # b % 2 / 3 - 1 < 10 > 0
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (binary_expression
+          (binary_expression
+            (binary_expression
+              (binary_expression
+                (identifier)
+                (identifier))
+              (integer))
+            (integer))
+          (integer))
+        (integer))
+      (integer))))

@@ -1,0 +1,302 @@
+==================
+Nested arrays and heterogeneous lists
+==================
+
+a = (/(/1, 2/), (/3, 4/)/)
+b = [/a, "label", True/]
+c = b[0]
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (array
+      (array
+        (integer)
+        (integer))
+      (array
+        (integer)
+        (integer))))
+  (assignment_statement
+    (identifier)
+    (list
+      (identifier)
+      (string
+        (string_content))
+      (boolean)))
+  (assignment_statement
+    (identifier)
+    (list_subscript_expression
+      (identifier)
+      (integer))))
+
+==================
+Slices and list slice
+==================
+
+x = a(:, 1:, :3, ::-1, 1:5:2, 1:5:)
+y = b[1:3]
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (slice)
+        (slice
+          (integer))
+        (slice
+          (integer))
+        (slice
+          (unary_expression
+            (integer)))
+        (slice
+          (integer)
+          (integer)
+          (integer))
+        (slice
+          (integer)
+          (integer)))))
+  (assignment_statement
+    (identifier)
+    (list_subscript_expression
+      (identifier)
+      (slice
+        (integer)
+        (integer)))))
+
+==================
+Coordinates and named dimensions
+==================
+
+x = t({20:50}, {100:130})
+y = t(lat|:, lon|::-1)
+z = t({lat|20:50}, {lon|100:130})
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (coordinate_subscript
+          (slice
+            (integer)
+            (integer)))
+        (coordinate_subscript
+          (slice
+            (integer)
+            (integer))))))
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (named_subscript
+          (identifier)
+          (slice))
+        (named_subscript
+          (identifier)
+          (slice
+            (unary_expression
+              (integer)))))))
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (coordinate_subscript
+          (named_subscript
+            (identifier)
+            (slice
+              (integer)
+              (integer))))
+        (coordinate_subscript
+          (named_subscript
+            (identifier)
+            (slice
+              (integer)
+              (integer))))))))
+
+==================
+File group variable and metadata access
+==================
+
+x = f=>physics->T(0,:)
+x@units = "K"
+x!0 = "lat"
+x&lat = (/20, 30/)
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (file_variable_expression
+        (file_group_expression
+          (identifier)
+          (identifier))
+        (identifier))
+      (argument_list
+        (integer)
+        (slice))))
+  (assignment_statement
+    (attribute_expression
+      (identifier)
+      (identifier))
+    (string
+      (string_content)))
+  (assignment_statement
+    (dimension_expression
+      (identifier)
+      (integer))
+    (string
+      (string_content)))
+  (assignment_statement
+    (coordinate_expression
+      (identifier)
+      (identifier))
+    (array
+      (integer)
+      (integer))))
+
+==================
+Dynamic names
+==================
+
+x = f->$names(0)$
+x@$attname$ = "K"
+x&$dimname$ = lat
+y = x($dimname$|:)
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (file_variable_expression
+      (identifier)
+      (dynamic_identifier
+        (application_expression
+          (identifier)
+          (argument_list
+            (integer))))))
+  (assignment_statement
+    (attribute_expression
+      (identifier)
+      (dynamic_identifier
+        (identifier)))
+    (string
+      (string_content)))
+  (assignment_statement
+    (coordinate_expression
+      (identifier)
+      (dynamic_identifier
+        (identifier)))
+    (identifier))
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (named_subscript
+          (dynamic_identifier
+            (identifier))
+          (slice))))))
+
+==================
+Create setvalues getvalues blocks
+==================
+
+obj = create "canvas" cairoWindowWorkstationClass defaultapp
+  "wkWidth" : 800
+end create
+setvalues obj
+  "wkWidth" : 1024
+end setvalues
+getvalues obj
+  "wkWidth" : width
+end getvalues
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (create_expression
+      (string
+        (string_content))
+      (identifier)
+      (resource_assignment
+        (string
+          (string_content))
+        (integer))))
+  (setvalues_statement
+    (identifier)
+    (resource_assignment
+      (string
+        (string_content))
+      (integer)))
+  (getvalues_statement
+    (identifier)
+    (resource_retrieval
+      (string
+        (string_content))
+      (identifier))))
+
+==================
+Resources from plotting snippet
+==================
+
+png = "png"
+png@wkWidth = 3084
+res = True
+res@cnFillOn = True
+wks = gsn_open_wks(png, "plot")
+gsn_panel(wks, plots, (/1,2/), res)
+
+---
+
+(source_file
+  (assignment_statement
+    (identifier)
+    (string
+      (string_content)))
+  (assignment_statement
+    (attribute_expression
+      (identifier)
+      (identifier))
+    (integer))
+  (assignment_statement
+    (identifier)
+    (boolean))
+  (assignment_statement
+    (attribute_expression
+      (identifier)
+      (identifier))
+    (boolean))
+  (assignment_statement
+    (identifier)
+    (application_expression
+      (identifier)
+      (argument_list
+        (identifier)
+        (string
+          (string_content)))))
+  (call_statement
+    (application_expression
+      (identifier)
+      (argument_list
+        (identifier)
+        (identifier)
+        (array
+          (integer)
+          (integer))
+        (identifier)))))
